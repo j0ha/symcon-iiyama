@@ -1,0 +1,20 @@
+{
+  "id": "{470AAC69-65EE-4FF4-AFA5-1D42D9500F31}",
+  "name": "IIyama Display",
+  "type": 3,
+  "vendor": "",
+  "aliases": [],
+  "parent": "{3CFF0FD9-E306-41DB-9B5A-9D06D38576C4}",
+  "children": [],
+  "implemented": [
+    "Create",
+    "Destroy",
+    "ApplyChanges",
+    "GetConfigurationForm",
+    "ReceiveData",
+    "RequestAction"
+  ],
+  "prefix": "IIY",
+  "url": "",
+  "wikiurl": ""
+}

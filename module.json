@@ -1,0 +1,9 @@
+{
+  "strictOrder": true,
+  "modules": [
+    {
+      "directory": "IIyamaDisplay",
+      "module": "IIyamaDisplay"
+    }
+  ]
+}
