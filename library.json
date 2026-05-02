@@ -1,12 +1,11 @@
 {
-    "id": "{B30F9F59-8401-2199-6D9C-96B7519127E5}",
-    "name": "IIyama Display",
-    "author": "prassek",
+    "id": "{E79F73CC-3A72-E68F-2F4D-447372075BFA}",
+    "name": "PreheatScheduler",
+    "author": "Prassek",
+    "url": "https://example.com/preheatschedulerw",
     "compatibility": {
-        "version": "4.2",
-        "date": 1491343200
+        "version": "7.1"
     },
-    "url": "https://github.com/j0ha/symcon-iiyama",
     "version": "1.0",
     "build": 0,
     "date": 0
