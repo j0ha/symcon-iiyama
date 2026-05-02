@@ -1,20 +1,12 @@
 {
-  "id": "{470AAC69-65EE-4FF4-AFA5-1D42D9500F31}",
-  "name": "IIyama Display",
-  "type": 4,
-  "vendor": "",
-  "aliases": [],
-  "parent": "{3CFF0FD9-E306-41DB-9B5A-9D06D38576C4}",
-  "children": [],
-  "implemented": [
-    "Create",
-    "Destroy",
-    "ApplyChanges",
-    "GetConfigurationForm",
-    "ReceiveData",
-    "RequestAction"
-  ],
-  "prefix": "IIY",
-  "url": "",
-  "wikiurl": ""
+    "id": "{CE396DEA-CE9D-900C-93CB-5E7C7D3BBAB1}",
+    "name": "IIyama Display",
+    "type": 4,
+    "vendor": "",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "IIL",
+    "url": "https://github.com/j0ha/symcon-iiyama"
 }

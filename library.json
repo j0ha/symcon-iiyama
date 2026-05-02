@@ -1,9 +1,12 @@
 {
-    "id": "{D4D8B2C0-C73E-4187-AA61-63A19C216AE2}",
-    "author": "Johannes Schur",
+    "id": "{A8C9FEE4-49D5-E655-F1AD-A1871A0C6CA1}",
     "name": "IIyama Display",
+    "author": "prassek",
     "url": "https://github.com/j0ha/symcon-iiyama",
+    "compatibility": {
+        "version": "7.1"
+    },
     "version": "1.0",
-    "build": 1,
-    "date": 1746144000
+    "build": 0,
+    "date": 0
 }
