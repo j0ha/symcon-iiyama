@@ -1,0 +1,62 @@
+{
+  "elements": [
+    {
+      "type": "NumberSpinner",
+      "name": "MonitorID",
+      "caption": "Monitor ID (1-255, 0 = broadcast / no ACK)",
+      "minimum": 0,
+      "maximum": 255
+    },
+    {
+      "type": "NumberSpinner",
+      "name": "PollingInterval",
+      "caption": "Status polling interval (seconds, 0 = disabled)",
+      "minimum": 0,
+      "maximum": 3600,
+      "suffix": "s"
+    },
+    {
+      "type": "Label",
+      "caption": "Power-On is NOT supported via LAN by the SICP protocol. Use Wake-on-LAN (separate IP-Symcon module or external mechanism) to power the display on. Only Power-Off is exposed by this module."
+    }
+  ],
+  "actions": [
+    {
+      "type": "Button",
+      "caption": "Fetch Device Info Now",
+      "onClick": "IIY_FetchDeviceInfo($id);"
+    },
+    {
+      "type": "Button",
+      "caption": "Poll Status Now",
+      "onClick": "IIY_PollStatus($id);"
+    }
+  ],
+  "status": [
+    {
+      "code": 101,
+      "icon": "active",
+      "caption": "Creating instance"
+    },
+    {
+      "code": 102,
+      "icon": "active",
+      "caption": "Active"
+    },
+    {
+      "code": 104,
+      "icon": "inactive",
+      "caption": "Inactive"
+    },
+    {
+      "code": 201,
+      "icon": "error",
+      "caption": "Parent socket not connected"
+    },
+    {
+      "code": 202,
+      "icon": "error",
+      "caption": "Invalid Monitor ID"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "{37778045-A085-5261-E2AE-4D76F782EB3D}",
+  "name": "IIyamaDisplay",
+  "type": 3,
+  "vendor": "Custom",
+  "aliases": ["iiyama Display", "iiyama ProLite LH60", "SICP Display"],
+  "parentRequirements": ["{3CFF0FD9-E306-41DB-9B5A-9D06D38576C4}"],
+  "childRequirements": [],
+  "implemented": [],
+  "prefix": "IIY",
+  "url": "https://johannes-prassek.de"
+}
