@@ -1,12 +1,12 @@
 {
     "id": "{CE396DEA-CE9D-900C-93CB-5E7C7D3BBAB1}",
-    "name": "IIyama Display",
-    "type": 4,
+    "name": "IIyamaDisplay",
+    "type": 3,
     "vendor": "",
-    "aliases": [],
+    "aliases": ["IIyama Display"],
     "parentRequirements": [],
     "childRequirements": [],
     "implemented": [],
     "prefix": "IIL",
-    "url": "https://github.com/j0ha/symcon-iiyama"
+    "url": "https://johannes-prassek.de"
 }
