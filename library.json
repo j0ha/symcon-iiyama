@@ -1,7 +1,11 @@
 {
-    "id": "{A8C9FEE4-49D5-E655-F1AD-A1871A0C6CA1}",
+    "id": "{B30F9F59-8401-2199-6D9C-96B7519127E5}",
     "name": "IIyama Display",
     "author": "prassek",
+    "compatibility": {
+        "version": "4.2",
+        "date": 1491343200
+    },
     "url": "https://github.com/j0ha/symcon-iiyama",
     "version": "1.0",
     "build": 0,
