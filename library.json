@@ -3,9 +3,6 @@
     "name": "IIyama Display",
     "author": "prassek",
     "url": "https://github.com/j0ha/symcon-iiyama",
-    "compatibility": {
-        "version": "7.1"
-    },
     "version": "1.0",
     "build": 0,
     "date": 0
