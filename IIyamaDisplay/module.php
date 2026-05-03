@@ -5,7 +5,7 @@ declare(strict_types=1);
 class IIyamaDisplay extends IPSModule
 {
     // Parent (Client Socket) DataID for SendDataToParent
-    private const PARENT_TX_DATAID = '{79827379-F36E-4D09-7486-2097DF03C07F}';
+    private const PARENT_TX_DATAID = '{79827379-F36E-4ADA-8A95-5F8D1DC92FA9}';
 
     // Packet framing
     private const PKT_HEADER_TX     = 0xA6;
@@ -96,8 +96,8 @@ class IIyamaDisplay extends IPSModule
     {
         parent::Create();
 
-        // Connect to a Client Socket parent
-        $this->ConnectParent('{3CFF0FD9-E306-41DB-9B5A-9D06D38576C3}');
+        // Connect to a Client Socket parent (non-fatal; user may attach manually).
+        @$this->ConnectParent('{3CFF0FD9-E306-41DB-9B5A-9D06D38576C3}');
 
         // Properties
         $this->RegisterPropertyInteger('MonitorID', 1);
