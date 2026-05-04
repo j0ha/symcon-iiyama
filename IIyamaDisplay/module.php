@@ -223,29 +223,41 @@ class IIyamaDisplay extends IPSModule
     /** Trigger a full status poll. */
     public function PollStatus(): void
     {
-        $this->SendPacket([self::CMD_POWER_GET]);
-        $this->SendPacket([self::CMD_CURRENT_SOURCE_GET]);
-        $this->SendPacket([self::CMD_VIDEO_PARAMS_GET]);
-        $this->SendPacket([self::CMD_COLOR_TEMP_GET]);
-        $this->SendPacket([self::CMD_COLOR_PARAMS_GET]);
-        $this->SendPacket([self::CMD_PICTURE_FORMAT_GET]);
-        $this->SendPacket([self::CMD_VOLUME_GET]);
-        $this->SendPacket([self::CMD_MISC_INFO_GET, 0x02]);
-        $this->SendPacket([self::CMD_PIXEL_SHIFT_GET]);
-        $this->SendPacket([self::CMD_IR_LOCK_GET]);
-        $this->SendPacket([self::CMD_KEYPAD_LOCK_GET]);
-        $this->SendPacket([self::CMD_COLD_START_GET]);
+        $cmds = [
+            [self::CMD_POWER_GET],
+            [self::CMD_CURRENT_SOURCE_GET],
+            [self::CMD_VIDEO_PARAMS_GET],
+            [self::CMD_COLOR_TEMP_GET],
+            [self::CMD_COLOR_PARAMS_GET],
+            [self::CMD_PICTURE_FORMAT_GET],
+            [self::CMD_VOLUME_GET],
+            [self::CMD_MISC_INFO_GET, 0x02],
+            [self::CMD_PIXEL_SHIFT_GET],
+            [self::CMD_IR_LOCK_GET],
+            [self::CMD_KEYPAD_LOCK_GET],
+            [self::CMD_COLD_START_GET],
+        ];
+        foreach ($cmds as $cmd) {
+            $this->SendPacket($cmd);
+            IPS_Sleep(200);
+        }
     }
 
     /** Fetch model, firmware, serial and platform info. */
     public function FetchDeviceInfo(): void
     {
-        $this->SendPacket([self::CMD_MODEL_INFO_GET, 0x00]); // Model number
-        $this->SendPacket([self::CMD_MODEL_INFO_GET, 0x01]); // FW version
-        $this->SendPacket([self::CMD_MODEL_INFO_GET, 0x02]); // Build date
-        $this->SendPacket([self::CMD_PLATFORM_LABEL_GET, 0x00]);
-        $this->SendPacket([self::CMD_PLATFORM_LABEL_GET, 0x01]);
-        $this->SendPacket([self::CMD_SERIAL_CODE_GET]);
+        $cmds = [
+            [self::CMD_MODEL_INFO_GET, 0x00],
+            [self::CMD_MODEL_INFO_GET, 0x01],
+            [self::CMD_MODEL_INFO_GET, 0x02],
+            [self::CMD_PLATFORM_LABEL_GET, 0x00],
+            [self::CMD_PLATFORM_LABEL_GET, 0x01],
+            [self::CMD_SERIAL_CODE_GET],
+        ];
+        foreach ($cmds as $cmd) {
+            $this->SendPacket($cmd);
+            IPS_Sleep(200);
+        }
     }
 
     /** Power off the display. Power-on requires Wake-on-LAN, not implemented here. */
