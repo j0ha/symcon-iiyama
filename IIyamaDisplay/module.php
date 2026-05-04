@@ -85,6 +85,7 @@ class IIyamaDisplay extends IPSModule
         0x0E => 'DVI-D',
         0x0F => 'HDMI 3',
         0x10 => 'Browser',
+        0x11 => 'HDMI 1',
         0x13 => 'Internal Storage',
         0x16 => 'Media Player',
         0x17 => 'PDF Player',
@@ -436,6 +437,8 @@ class IIyamaDisplay extends IPSModule
         $monitorId = $this->ReadPropertyInteger('MonitorID');
         $binary = $this->BuildPacket($monitorId, $data);
 
+        $this->SendDebug('TX', $binary, 1);
+
         $payload = [
             'DataID' => self::PARENT_TX_DATAID,
             'Buffer' => utf8_encode($binary)
@@ -461,6 +464,7 @@ class IIyamaDisplay extends IPSModule
         }
 
         $chunk = utf8_decode($msg['Buffer']);
+        $this->SendDebug('RX chunk', $chunk, 1);
         $buffer = $this->ReadAttributeString('RxBuffer') . $chunk;
 
         // Try to consume full frames from the buffer.
@@ -501,7 +505,8 @@ class IIyamaDisplay extends IPSModule
             $frame = substr($buffer, 0, $totalSize);
             $buffer = substr($buffer, $totalSize);
 
-            $this->ProcessFrame($frame);
+            $this->SendDebug('RX frame', $frame, 1);
+        $this->ProcessFrame($frame);
         }
 
         $this->WriteAttributeString('RxBuffer', $buffer);
@@ -518,6 +523,7 @@ class IIyamaDisplay extends IPSModule
         }
 
         if ($bytes[0] !== self::PKT_HEADER_RX) {
+            $this->SendDebug('ProcessFrame', sprintf('Bad reply header: 0x%02X', $bytes[0]), 0);
             $this->LogMessage(sprintf('Bad reply header: 0x%02X', $bytes[0]), KL_WARNING);
             return;
         }
@@ -525,7 +531,7 @@ class IIyamaDisplay extends IPSModule
         $monitorId = $bytes[1];
         $configuredId = $this->ReadPropertyInteger('MonitorID');
         if ($monitorId !== $configuredId) {
-            // Frame is for a different display sharing this socket — ignore silently.
+            $this->SendDebug('ProcessFrame', sprintf('Ignoring frame for monitor 0x%02X (configured: 0x%02X)', $monitorId, $configuredId), 0);
             return;
         }
 
@@ -535,6 +541,7 @@ class IIyamaDisplay extends IPSModule
             $checksum ^= $bytes[$i];
         }
         if ($checksum !== $bytes[$count - 1]) {
+            $this->SendDebug('ProcessFrame', sprintf('Checksum mismatch: calc 0x%02X, recv 0x%02X', $checksum, $bytes[$count - 1]), 0);
             $this->LogMessage(sprintf('Checksum mismatch: calc 0x%02X, recv 0x%02X', $checksum, $bytes[$count - 1]), KL_ERROR);
             return;
         }
@@ -551,6 +558,7 @@ class IIyamaDisplay extends IPSModule
     private function ParseReport(array $data): void
     {
         $opcode = $data[0];
+        $this->SendDebug('ParseReport', sprintf('opcode=0x%02X data=[%s]', $opcode, implode(' ', array_map(fn($b) => sprintf('%02X', $b), $data))), 0);
         switch ($opcode) {
             case self::REP_ACK:             $this->ParseACK($data);             break;
             case self::REP_POWER:           $this->ParsePowerState($data);      break;
@@ -570,6 +578,7 @@ class IIyamaDisplay extends IPSModule
             case self::REP_SCHEDULING:      $this->ParseScheduling($data);      break;
             case self::REP_PIXEL_SHIFT:     $this->ParsePixelShift($data);      break;
             default:
+                $this->SendDebug('ParseReport', sprintf('Unknown opcode 0x%02X', $opcode), 0);
                 $this->LogMessage(sprintf('Unknown reply opcode 0x%02X', $opcode), KL_WARNING);
         }
     }
@@ -605,7 +614,9 @@ class IIyamaDisplay extends IPSModule
             return;
         }
         // 0x01 = Off, 0x02 = On
-        $this->SetValue('PowerState', $data[1] === 0x02);
+        $on = $data[1] === 0x02;
+        $this->SendDebug('PowerState', sprintf('raw=0x%02X → %s', $data[1], $on ? 'On' : 'Off'), 0);
+        $this->SetValue('PowerState', $on);
     }
 
     private function ParseKeypadLock(array $data): void
@@ -665,6 +676,7 @@ class IIyamaDisplay extends IPSModule
         }
         $code = $data[1];
         $name = self::SOURCE_MAP[$code] ?? sprintf('Unknown (0x%02X)', $code);
+        $this->SendDebug('CurrentSource', sprintf('raw=0x%02X → %s', $code, $name), 0);
         $this->SetValue('CurrentSource', $name);
     }
 
@@ -672,8 +684,10 @@ class IIyamaDisplay extends IPSModule
     {
         // [0x33, brightness, color, contrast, sharpness, tint, blackLevel, gamma]
         if (count($data) < 8) {
+            $this->SendDebug('VideoParams', sprintf('Too short: %d bytes, data=[%s]', count($data), implode(' ', array_map(fn($b) => sprintf('%02X', $b), $data))), 0);
             return;
         }
+        $this->SendDebug('VideoParams', sprintf('brightness=%d color=%d contrast=%d sharpness=%d tint=%d blackLevel=%d gamma=%d', $data[1], $data[2], $data[3], $data[4], $data[5], $data[6], $data[7]), 0);
         $this->SetValue('Brightness',      $data[1]);
         $this->SetValue('ColorSaturation', $data[2]);
         $this->SetValue('Contrast',        $data[3]);
