@@ -490,9 +490,10 @@ class IIyamaDisplay extends IPSModule
             }
 
             // Frame layout: [HDR(0), MonID(1), Cat(2), Page(3), LEN(4), DC(5), DATA..., CHK]
-            // LEN covers LEN + DC + DATA + CHK = N + 3, so total frame = LEN + 4.
+            // RX LEN covers DC + DATA + CHK only (does not include itself).
+            // Total frame = 4 fixed header bytes + 1 LEN byte + LEN value = LEN + 5.
             $lenField = ord($buffer[4]);
-            $totalSize = $lenField + 4;
+            $totalSize = $lenField + 5;
             if ($len < $totalSize) {
                 break; // wait for more data
             }
