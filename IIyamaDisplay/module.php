@@ -107,6 +107,10 @@ class IIyamaDisplay extends IPSModule
         // Receive buffer (binary, accumulated between ReceiveData calls)
         $this->RegisterAttributeString('RxBuffer', '');
 
+        // Queue tracking which model-info kind (0=model, 1=fw, 2=date) to expect next,
+        // because the display does not echo the sub-command in its response.
+        $this->RegisterAttributeString('ModelInfoQueue', '[]');
+
         // Variable profiles
         $this->RegisterCustomProfiles();
 
@@ -246,6 +250,9 @@ class IIyamaDisplay extends IPSModule
     /** Fetch model, firmware, serial and platform info. */
     public function FetchDeviceInfo(): void
     {
+        // Prime queue so ParseModelInfo knows which kind each response maps to.
+        $this->WriteAttributeString('ModelInfoQueue', json_encode([0, 1, 2]));
+
         $cmds = [
             [self::CMD_MODEL_INFO_GET, 0x00],
             [self::CMD_MODEL_INFO_GET, 0x01],
@@ -650,12 +657,21 @@ class IIyamaDisplay extends IPSModule
         if (count($data) < 2) {
             return;
         }
-        $kind = $data[1];
-        $payload = $this->BytesToAsciiString(array_slice($data, 2));
+        // Display does not echo the sub-command; consume the expected kind from the queue.
+        $queue = json_decode($this->ReadAttributeString('ModelInfoQueue'), true);
+        if (!is_array($queue) || empty($queue)) {
+            $this->SendDebug('ModelInfo', 'Unexpected response (queue empty)', 0);
+            return;
+        }
+        $kind = array_shift($queue);
+        $this->WriteAttributeString('ModelInfoQueue', json_encode(array_values($queue)));
+
+        $payload = $this->BytesToAsciiString(array_slice($data, 1));
+        $this->SendDebug('ModelInfo', sprintf('kind=%d payload="%s"', $kind, $payload), 0);
         switch ($kind) {
-            case 0x00: $this->SetValue('ModelNumber', $payload); break;
-            case 0x01: $this->SetValue('FirmwareVersion', $payload); break;
-            case 0x02: $this->SetValue('BuildDate', $payload); break;
+            case 0: $this->SetValue('ModelNumber', $payload); break;
+            case 1: $this->SetValue('FirmwareVersion', $payload); break;
+            case 2: $this->SetValue('BuildDate', $payload); break;
         }
     }
 
@@ -664,13 +680,12 @@ class IIyamaDisplay extends IPSModule
         if (count($data) < 2) {
             return;
         }
-        // Both 0x00 (OTSC version) and 0x01 (label) end up in PlatformLabel.
-        $payload = $this->BytesToAsciiString(array_slice($data, 2));
+        // Display does not echo the sub-command. We receive two responses (kind 0 and 1);
+        // each overwrites PlatformLabel so the last one (the human-readable label) wins.
+        $payload = $this->BytesToAsciiString(array_slice($data, 1));
+        $this->SendDebug('PlatformLabel', sprintf('payload="%s"', $payload), 0);
         if ($payload !== '') {
-            $existing = $this->GetValue('PlatformLabel');
-            if ($data[1] === 0x01 || $existing === '') {
-                $this->SetValue('PlatformLabel', $payload);
-            }
+            $this->SetValue('PlatformLabel', $payload);
         }
     }
 
@@ -746,11 +761,18 @@ class IIyamaDisplay extends IPSModule
 
     private function ParseMiscInfo(array $data): void
     {
-        // Operating Hours: [0x0F, 0x02, hoursH, hoursL, minutes]
-        if (count($data) >= 4 && $data[1] === 0x02) {
+        // Some displays echo the sub-command 0x02 at data[1]; others omit it.
+        // Detect by checking whether data[1] == 0x02 AND enough bytes follow for hours.
+        if ($data[1] === 0x02 && count($data) >= 4) {
             $hours = ($data[2] << 8) | $data[3];
-            $this->SetValue('OperatingHours', $hours);
+        } elseif (count($data) >= 3) {
+            $hours = ($data[1] << 8) | $data[2];
+        } else {
+            $this->SendDebug('MiscInfo', sprintf('Too short: %d bytes', count($data)), 0);
+            return;
         }
+        $this->SendDebug('MiscInfo', sprintf('hours=%d', $hours), 0);
+        $this->SetValue('OperatingHours', $hours);
     }
 
     private function ParseSerialCode(array $data): void
